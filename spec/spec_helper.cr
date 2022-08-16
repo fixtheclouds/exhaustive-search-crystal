@@ -1,2 +1,2 @@
 require "spec"
-require "../src/pes"
+require "../src/exhaustive_search"

@@ -1,7 +1,7 @@
 require "option_parser"
-require "./pes/runner"
+require "./exhaustive_search/runner"
 
-module Pes
+module ExhaustiveSearch
   # TODO: Put your code here
 end
 

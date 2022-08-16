@@ -1,4 +1,4 @@
-module Pes
+module ExhaustiveSearch
   class Runner
     EMPTY = ["\0"]
     LOWERCASE_LETTERS = EMPTY | [*"a".."z"]

@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-describe Pes do
+describe ExhaustiveSearch do
   # TODO: Write tests
 
   it "works" do

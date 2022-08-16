@@ -1,4 +1,4 @@
-name: pes
+name: exhaustive_search
 version: 0.1.0
 
 authors:
@@ -6,7 +6,7 @@ authors:
 
 targets:
   pes:
-    main: src/pes.cr
+    main: src/exhaustive_search.cr
 
 crystal: 1.5.0
 
