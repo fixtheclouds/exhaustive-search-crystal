@@ -22,4 +22,6 @@ option_parser = OptionParser.parse do |parser|
   end
 end
 
-Pes::Runner.new(hash, Int8.new(limit), characters).call
+raise "Target hash must be set" if hash.blank?
+
+ExhaustiveSearch::Runner.new(hash, Int8.new(limit), characters).call
