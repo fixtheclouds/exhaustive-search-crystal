@@ -24,7 +24,7 @@ module ExhaustiveSearch
     property per_fiber : UInt64
     property max_position : UInt64
 
-    def initialize(hash : String, limit : UInt8, characters : String = "numbers")
+    def initialize(hash : String, limit : UInt8, characters : String)
       @hash = hash
       @limit = limit
       @characters = characters
@@ -47,8 +47,8 @@ module ExhaustiveSearch
       CHARSET_MAPPING[characters]
     end
 
-    private def total_combinations_count
-      charset.size ** limit
+    private def total_combinations_count : UInt64
+      (charset.size ** limit).to_u64
     end
 
     private def upper_boundary(fiber_number) : UInt64
