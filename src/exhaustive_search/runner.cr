@@ -16,32 +16,51 @@ module ExhaustiveSearch
       "full" => ALL
     }
 
-    FIBER_COUNT = 16
+    FIBER_COUNT = 16_u16
+
+    property hash : String
+    property limit : UInt8
+    property characters : String
+    property per_fiber : UInt64
+    property max_position : UInt64
 
     def initialize(hash : String, limit : UInt8, characters : String = "numbers")
       @hash = hash
       @limit = limit
       @characters = characters
+      @per_fiber = (total_combinations_count / FIBER_COUNT).ceil.to_u64
+      @max_position = (total_combinations_count - 1).to_u64
     end
 
     def call
-      per_fiber = (total_combinations_count / FIBER_COUNT).ceil.to_u64
-      (0..FIBER_COUNT).map do |i|
-        range : Range(UInt64, UInt64) = (per_fiber * i)..((per_fiber * (i + 1)) - 1)
+      (0_u16...FIBER_COUNT).map do |i|
+        range : Range(UInt64, UInt64) = lower_boundary(i)..upper_boundary(i)
         spawn do
-          Processor.new(charset, range, @limit)
+          Processor.new(charset, range, limit, i + 1).call
         end
-
-        Fiber.yield
       end
+
+      Fiber.yield
     end
 
     private def charset
-      CHARSET_MAPPING[@characters]
+      CHARSET_MAPPING[characters]
     end
 
     private def total_combinations_count
-      charset.size ** @limit
+      charset.size ** limit
+    end
+
+    private def upper_boundary(fiber_number) : UInt64
+      # Stop iterating at the end of range to avoid threspassing it
+      return max_position if fiber_number == FIBER_COUNT - 1
+
+      # Take the beginning of the next chuck minus 1 to avoid intersection
+      (per_fiber * (fiber_number + 1)) - 1
+    end
+
+    private def lower_boundary(fiber_number) : UInt64
+      per_fiber * fiber_number
     end
   end
 end
