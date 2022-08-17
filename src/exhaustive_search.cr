@@ -24,4 +24,4 @@ end
 
 raise "Target hash must be set" if hash.blank?
 
-ExhaustiveSearch::Runner.new(hash, Int8.new(limit), characters).call
+ExhaustiveSearch::Runner.new(hash, UInt8.new(limit), characters).call

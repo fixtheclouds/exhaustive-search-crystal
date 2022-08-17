@@ -1,3 +1,5 @@
+require "./processor"
+
 module ExhaustiveSearch
   class Runner
     EMPTY = ["\0"]
@@ -16,14 +18,22 @@ module ExhaustiveSearch
 
     FIBER_COUNT = 16
 
-    def initialize(hash : String, limit : Int8, characters : String)
+    def initialize(hash : String, limit : UInt8, characters : String = "numbers")
       @hash = hash
       @limit = limit
       @characters = characters
     end
 
     def call
-      per_fiber = (total_combinations_count / FIBER_COUNT).ceil
+      per_fiber = (total_combinations_count / FIBER_COUNT).ceil.to_u64
+      (0..FIBER_COUNT).map do |i|
+        range : Range(UInt64, UInt64) = (per_fiber * i)..((per_fiber * (i + 1)) - 1)
+        spawn do
+          Processor.new(charset, range, @limit)
+        end
+
+        Fiber.yield
+      end
     end
 
     private def charset
@@ -31,7 +41,7 @@ module ExhaustiveSearch
     end
 
     private def total_combinations_count
-      ALL.size ** @limit
+      charset.size ** @limit
     end
   end
 end
