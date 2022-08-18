@@ -1,3 +1,4 @@
+require "benchmark"
 require "./processor"
 
 module ExhaustiveSearch
@@ -16,7 +17,7 @@ module ExhaustiveSearch
       "full" => ALL
     }
 
-    FIBER_COUNT = 16_u16
+    FIBER_COUNT = 1_u16
 
     property hash : String
     property limit : UInt8
@@ -26,6 +27,10 @@ module ExhaustiveSearch
 
     def initialize(hash : String, limit : UInt8, characters : String)
       @hash = hash
+      if limit > 5
+        raise "My possibilities are limited, please use a limit not greater than 5"
+      end
+
       @limit = limit
       @characters = characters
       @per_fiber = (total_combinations_count / FIBER_COUNT).ceil.to_u64
@@ -34,16 +39,19 @@ module ExhaustiveSearch
 
     def call
       original_string = ""
-      (0_u16...FIBER_COUNT).map do |i|
-        range : Range(UInt64, UInt64) = lower_boundary(i)..upper_boundary(i)
-        spawn do
-          result = Processor.new(charset, range, hash, i + 1).call
-          original_string = result if result
+      measure = Benchmark.measure do
+        (0_u16...FIBER_COUNT).map do |i|
+          range : Range(UInt64, UInt64) = lower_boundary(i)..upper_boundary(i)
+          spawn do
+            result = Processor.new(charset, range, hash, i + 1).call
+            original_string = result if result
+          end
         end
-      end
 
-      Fiber.yield
-      puts "String found: #{original_string}"
+        Fiber.yield
+      end
+      puts "String found: #{original_string}" if original_string
+      puts measure
     end
 
     private def charset

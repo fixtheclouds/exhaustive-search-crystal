@@ -17,7 +17,7 @@ module ExhaustiveSearch
         return string if @target == md5
 
         # TODO: dynamic breakpoints
-        if i % 1000 == 0
+        if i % 100000 == 0
           puts "fiber #{@fiber_id}: #{string}, hash: #{md5}"
         end
       end

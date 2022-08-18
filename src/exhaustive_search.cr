@@ -6,14 +6,14 @@ module ExhaustiveSearch
 end
 
 hash = ""
-limit = 10
+limit = 5
 characters = "alphanumeric"
 option_parser = OptionParser.parse do |parser|
   parser.on "-h hash", "--hash=hash", "hash to guess" do |value|
     hash = value
   end
 
-  parser.on "-l limit", "--limit=10", "character limit, default is 10" do |value|
+  parser.on "-l limit", "--limit=10", "character limit, default is 5" do |value|
     limit = value
   end
 
