@@ -2,23 +2,20 @@ require "digest/md5"
 
 module ExhaustiveSearch
   class Processor
-    # TODO: pass string ranges, not absolute indices
-    def initialize(charset : Array(String), range : Range(UInt64, UInt64), target : String, fiber_id : UInt16)
+    def initialize(charset : Array(String), target : String, limit : UInt64)
       @charset = charset
-      @range = range
       @target = target
-      @fiber_id = fiber_id
+      @limit = limit
     end
 
     def call
-      @range.each_with_index do |position, i|
+      range.each_with_index do |position, i|
         string = position_to_string(position)
         md5 = Digest::MD5.hexdigest(string)
         return string if @target == md5
 
-        # TODO: dynamic breakpoints
-        if i % 100000 == 0
-          puts "fiber #{@fiber_id}: #{string}, hash: #{md5}"
+        if i % breakpoint == 0
+          puts "searching: #{string}, hash: #{md5}"
         end
       end
     end
@@ -27,11 +24,20 @@ module ExhaustiveSearch
       @charset.size
     end
 
+    private def breakpoint
+      @charset.size ** (@limit - 1)
+    end
+
+    private def range
+      0_u64..(@charset.size ** @limit).to_u64
+    end
+
+    # TODO: enhance algorhytm and remove this
     private def position_to_string(position : UInt64) : String
       str : String = ""
       n = position
       while n > 0
-        str = str + @charset[n % base]
+        str = @charset[n % base] + str
         n = n // base
       end
       str
