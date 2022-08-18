@@ -23,12 +23,11 @@ module ExhaustiveSearch
 
     def initialize(hash : String, limit : UInt8, characters : String)
       @hash = hash
-      if limit > 5
-        raise "My possibilities are limited, please use a limit not greater than 5"
-      end
-
       @limit = limit
       @characters = characters
+
+      validate_limit
+      validate_hash
     end
 
     def call
@@ -38,6 +37,14 @@ module ExhaustiveSearch
       end
       puts "String found: #{original_string}" if original_string
       puts measure
+    end
+
+    private def validate_limit
+      raise "My possibilities are limited, please use a limit not greater than 5" if limit > 5
+    end
+
+    private def validate_hash
+      raise "Invalid MD5 hash format" unless /^[0-9a-f]{32}$/ =~ hash
     end
 
     private def charset
