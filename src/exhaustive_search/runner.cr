@@ -33,14 +33,17 @@ module ExhaustiveSearch
     end
 
     def call
+      original_string = ""
       (0_u16...FIBER_COUNT).map do |i|
         range : Range(UInt64, UInt64) = lower_boundary(i)..upper_boundary(i)
         spawn do
-          Processor.new(charset, range, limit, i + 1).call
+          result = Processor.new(charset, range, hash, i + 1).call
+          original_string = result if result
         end
       end
 
       Fiber.yield
+      puts "String found: #{original_string}"
     end
 
     private def charset
