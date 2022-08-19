@@ -19,7 +19,7 @@ module ExhaustiveSearch
         str = generator.next
         md5 = Digest::MD5.hexdigest(str)
         if generator.step % breakpoint == 0
-          puts str
+          puts "searching: #{str}, hash: #{md5}"
         end
         return str if target == md5
       end
